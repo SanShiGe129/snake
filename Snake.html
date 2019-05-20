@@ -1,0 +1,324 @@
+<!doctype html><!--强调文档类型-->
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="Generator" content="EditPlus®">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="关键词，关键字">
+  <meta name="Description" content="描述信息">
+  <title>贪吃蛇，第一个js程序</title> 
+  <!--css样式--> 
+  <style type = "text/css">
+  <!-- id 选择器 一个段落只能有一个选择器 问题 为啥用id就不行？？在代码的中间不能穿插注释否则代码会失效-->
+  *{
+     margin:0px;  //消除原始内边距
+  }
+  #canvas{
+   <!-- border-radius是显示圆角 box-shadow: 左右移动 上下移动 阴影程度 颜色-->
+     background:#ccffff;  margin:100px auto; display:block;border:10px solid #999900;border-radius:4px;box-shadow:0px 0px 6px #000;
+	 <!-- 注意不要用align = “center” 然后在把他压下去 记好了margin:上 左右 下 margin:上下 左右 margin:上 左 下 右-->
+	 <!--把canvas显示为块级元素！-->
+	 
+  }
+
+  </style>
+
+ </head>
+ <body>
+ 
+  <!-- 一个容器 一个画布 -->
+ <canvas width = "450" height = "450" id = "canvas"></canvas>
+ <!-- js -->
+ <script>
+    //要封装
+    //拿到画板
+	var canvas = document.getElementById("canvas");
+	//获取画板权限
+	var ctx = canvas.getContext("2d");
+	//开始画画
+	var width = 15;
+    var snakecount = 6;
+	var snakecount2 = 6;
+
+	//定义一个数组其作用是存放蛇的坐标，以方便对蛇身的填充
+	var snake = [6];
+	var snake2 = [6];
+	var foodX = 0;
+	var foodY = 0;
+	var toGo = 3;    //注意此处必须要有初始值3（向右转）！！否则会出现错误
+	var toGo2 = 3;
+	function drawRect()
+	{
+
+		//绘制方格
+		for(var i=0; i<30; i++)
+		{ 
+			ctx.strokeStyle = "#000000";//线条的颜色
+			//起点
+			ctx.beginPath();    //解决线条的一致性
+			ctx.moveTo(i*15,0);  //代表着宽高都是15px
+			//终点
+			ctx.lineTo(i*15,450);
+				 
+			ctx.moveTo(0,i*15);
+			ctx.lineTo(450,i*15);
+			ctx.closePath();
+			ctx.stroke();//绘制线
+		}
+
+	   //画蛇
+		for(var i=0; i<snakecount; i++)
+		{   
+			ctx.fillStyle = "#000000";  //为方格填充颜色
+			if(i == snakecount-1)
+			{
+				ctx.fillStyle = "red";
+
+			}
+			ctx.fillRect(snake[i].x,snake[i].y,15,15);//前面两个的数据是起始坐标，后两个是结束坐标
+		}
+
+		//绘制食物
+		ctx.fillStyle = "blue";   
+		ctx.fillRect(foodX,foodY,15,15);
+		ctx.fill();
+	}
+
+	function drawRect2()
+	{
+
+		//绘制方格
+		for(var i=0; i<30; i++)
+		{ 
+			ctx.strokeStyle = "#000000";//线条的颜色
+			//起点
+			ctx.beginPath();    //解决线条的一致性
+			ctx.moveTo(i*15,0);  //代表着宽高都是15px
+			//终点
+			ctx.lineTo(i*15,450);
+				 
+			ctx.moveTo(0,i*15);
+			ctx.lineTo(450,i*15);
+			ctx.closePath();
+			ctx.stroke();//绘制线
+		}
+
+	   //画蛇
+		for(var i=0; i<snakecount2; i++)
+		{   
+			ctx.fillStyle = "yellow";  //为方格填充颜色
+			if(i == snakecount2-1)
+			{
+				ctx.fillStyle = "red";
+
+			}
+			ctx.fillRect(snake2[i].x,snake2[i].y,15,15);//前面两个的数据是起始坐标，后两个是结束坐标
+		}
+	}
+
+	//遍历蛇的长度
+	function start()
+	{
+		for(var i=0; i<snakecount; i++)
+		{
+			snake[i] = {x:i*15,y:60};
+	
+		}
+
+		addfood();
+		drawRect();
+	}
+
+	//遍历蛇2的长度
+  function start2(){
+
+	    for(var j=0; j<snakecount2; j++)
+		{
+			snake2[j] = {x:j*15,y:435};
+	
+		}
+		drawRect2();
+  }
+
+	//添加随机食物的坐标
+	function addfood()
+	{
+		//随机坐标
+		foodX = Math.floor(Math.random()*30)*15;  //Math.floor是对Math.random所产生的随机数进行取整 而Math.random只能产生0~1范围內的随机数
+		foodY = Math.floor(Math.random()*30)*15;
+		for(var i=0; i<snakecount-1; i++)
+		{
+			if(foodX == snake[i].x && foodY == snake[i].y)  //只需判断他们的一个方格的起始坐标是否相等，就可以避免重复！
+			{
+				addfood();                               //注意这是函数的递归！
+			}
+		}
+
+//		for(var j=0; j<snakecount2-1; j++)
+	//	{
+	//		if(foodX == snake2[j].x && foodY == snake2[j].y)  //只需判断他们的一个方格的起始坐标是否相等，就可以避免重复！
+	//		{
+		//		addfood();                               //注意这是函数的递归！
+		//	}
+		//}
+    }
+	
+	function move()
+	{
+		switch(toGo)
+		{
+			//第一条蛇
+			case 1:snake.push({x:snake[snakecount-1].x-15,y:snake[snakecount-1].y});break; //向左拐 要注意蛇的数组值和坐标值不是一个概念切勿搞混！
+			case 2:snake.push({x:snake[snakecount-1].x,y:snake[snakecount-1].y-15});break; //向上拐
+			case 3:snake.push({x:snake[snakecount-1].x+15,y:snake[snakecount-1].y});break;//向右拐
+			case 4:snake.push({x:snake[snakecount-1].x,y:snake[snakecount-1].y+15});break;//向下拐
+     	}
+
+		switch(toGo2)
+		{
+			//第一条蛇
+			case 1:snake2.push({x:snake2[snakecount2-1].x-15,y:snake2[snakecount2-1].y});break; //向左拐 要注意蛇的数组值和坐标值不是一个概念切勿搞混！
+			case 2:snake2.push({x:snake2[snakecount2-1].x,y:snake2[snakecount2-1].y-15});break; //向上拐
+			case 3:snake2.push({x:snake2[snakecount2-1].x+15,y:snake2[snakecount2-1].y});break;//向右拐
+			case 4:snake2.push({x:snake2[snakecount2-1].x,y:snake2[snakecount2-1].y+15});break;//向下拐
+		}
+		//删除第一个元素
+		snake.shift();
+		snake2.shift();
+		//重新绘制
+		ctx.clearRect(0,0,450,450);
+		isdead();   //此句为什么要放这里？  因为上面的坐标每移动一次就要判断一次!
+		isknock();
+		ineat();
+		drawRect();
+		drawRect2();
+	}
+
+	function keyDown(e)
+	{
+		switch(e.keyCode)
+		{
+			
+			case 37:toGo = 1;break;
+			case 38:toGo = 2;break;
+			case 39:toGo = 3;break;
+			case 40:toGo = 4;break;
+
+			//第二条蛇 a,65;s,83 d 68 w 87
+			case 65:toGo2 = 1;break;
+			case 87:toGo2 = 2;break;
+			case 68:toGo2 = 3;break;
+			case 83:toGo2 = 4;break;
+		}
+	}
+	//制定游戏规则
+	
+	function isdead()
+	{    //撞墙死
+		if(snake[snakecount-1].x<0||snake[snakecount-1].y<0||snake[snakecount-1].x>435||snake[snakecount-1].y>435)
+		{
+			//alert("黑蛇已死亡");   
+			//window.location.reload();  //重新加载页面！为什么放if外面就不行了？
+			isReset1();
+		}
+		if(snake2[snakecount2-1].x<0||snake2[snakecount2-1].y<0||snake2[snakecount2-1].x>435||snake2[snakecount2-1].y>435)
+		{
+			//alert("黄蛇已死亡");   //
+			//window.location.reload();  //重新加载页面！为什么放if外面就不行了？
+			isReset2();
+		}
+	}
+	
+	//互相碰撞复位
+	function isknock()
+	{
+		//看黑蛇的蛇头和黄蛇的蛇身是否相等
+		//黑蛇撞黄蛇复位 遍历黄蛇坐标看是否与黑蛇头坐标相等！
+		for(var i=0; i<snake2.length; i++){
+			if( snake[snakecount-1].x == snake2[i].x && snake[snakecount-1].y == snake2[i].y){
+				isReset1();
+			}
+		}
+
+		for(var j=0; j<snake.length; j++){
+			if( snake2[snakecount2-1].x == snake[j].x && snake2[snakecount2-1].y == snake[j].y){
+				isReset2();
+			}
+		}
+	}
+
+	//黑蛇复位
+	function isReset1(){
+
+        toGo = 3;
+		snake = [];
+		snakecount = 6;
+
+		for(var i=0; i<snakecount; i++)
+		{
+			snake[i] = {x:i*15,y:0};
+	
+		}
+	}
+
+	//黄蛇复位
+	function isReset2(){
+        toGo2 = 3;
+		snake2 = [];
+		snakecount2 = 6;
+	    for(var j=0; j<snakecount2; j++)
+		{
+			snake2[j] = {x:j*15,y:435};
+		}
+	}
+
+	//吃食物增加长度
+	function ineat()
+	{
+		//增加第一条蛇的长度
+		if(snake[snakecount-1].x == foodX && snake[snakecount-1].y == foodY)
+		{
+			//添加随机食物
+			addfood();
+			//使蛇的长度加1；注意此处是使用方法unshift使元素加一
+			snakecount++;
+			snake.unshift({x:-1500,y:-1500});  //这句的意思是在蛇尾增加一个单位长度
+			
+		}
+
+		//增加第二条蛇的长度
+
+	    if(snake2[snakecount2-1].x == foodX && snake2[snakecount2-1].y == foodY)
+		{
+			//添加随机食物
+			addfood();
+			//使蛇的长度加1；注意此处是使用方法unshift使元素加一
+			snakecount2++;
+			snake2.unshift({x:-1500,y:-1500});  //这句的意思是在蛇尾增加一个单位长度 而增加的元素是无效的
+			
+		}
+	}
+
+	function btnstart()    //注意整个程序先从这里开始看起
+	{   //监听键盘事件
+		setInterval("move()",150); //此句的意思是每隔150秒在执行move语句  这句是蛇可以自己移动的原因
+		document.onkeydown = function(e)
+	    {
+			//浏览器的兼容性
+			var e = e||window.event;
+			//console.log(e.keyCode); 此语句是在浏览器上查看个键盘的代码数值
+			keyDown(e);
+	    }
+
+	}
+	
+	//当前页面加载完成执行此方法
+	window.onload = function()
+	{
+	    start();
+		start2();
+		btnstart();
+	}
+ </script>
+ </body>
+</html>
